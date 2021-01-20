@@ -71,7 +71,7 @@ class Email_manager ():
             menssage = "Error to login: SMTP( {} ) or SMTP Port ( {} ) error".format(self.smtp, self.port)
 
             # Send email to user with error information, with server email
-            self.smtpObj_server.sendmail(self.email_server, self.email_user, "Subject: Error to login JC Toolz\n\n"+menssage) 
+            self.smtpObj_server.sendmail(self.email_server, self.email_user, "Subject: Error to login JC Toolz\n\n"+menssage+"\n NO REPLAY")
 
             # Raise an error to stop program
             raise ValueError (menssage)
@@ -92,7 +92,7 @@ class Email_manager ():
                 menssage = 'Error to login: Email adrress ( {} ) of password_user ( {} ) error.'.format (self.email_user, self.password_user)
 
                 # Send email to user with error information
-                self.smtpObj_server.sendmail(self.email_server, self.email_user, "Subject: Error to login JC Toolz\n\n"+menssage) 
+                self.smtpObj_server.sendmail(self.email_server, self.email_user, "Subject: Error to login JC Toolz\n\n"+menssage+"\n NO REPLAY") 
 
                 # If error happends while loggin, then raise an error to stop program
                 raise ValueError (menssage)
