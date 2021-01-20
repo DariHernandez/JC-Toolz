@@ -5,6 +5,7 @@ import os, pprint
 from google_sheets import Google_sheets
 from email_manager import Email_manager
 from data_manager import Data_manager
+from web_scraping import Web_scraping
 
 # Link of the google sheet
 sheet = "https://docs.google.com/spreadsheets/d/1ecgbu4-tBPrXJtZzMFKN1YQdBdJ9aE5tKWLGBdDhVE0/edit?usp=sharing"
@@ -32,6 +33,8 @@ new_data = my_data_manager.compare_data (data)
 # Loop for each new register of data
 for row in new_data: 
 
+    # EMAIL CONECTION
+
     # Local email account to send error message
     email_server = "lbexpressinvoices@gmail.com"
     password_server = "Superman2019"
@@ -47,7 +50,43 @@ for row in new_data:
     my_email.login (email_user, password_user)
 
 
-    my_email.send_email (to_email = "hernandezdarifrancisco@gmail.com", subject = "Example email", text = "This is a text email")
+    # WEB SCRAPING
+
+    # name of the city to make web sraping
+    city_name = row["city"]
+    
+    # Credentials of the web page
+    page_user = "kyitzchok"
+    page_password = "freightNY"
+
+    # Instance of the web scraping class
+    my_web_scraping = Web_scraping (page_user, page_password, city_name)
+    emails = my_web_scraping.get_email_truckers ()
+
+    # Make a loop for each contact email
+    for email in emails: 
+        
+        # get data for the email from google sheet
+        amount = row["amount"]
+        type = row["type"]
+        overweight = row["overweight"]
+        commodity = row["commodity"]
+        pick = row["pick"]
+        drop = row["drop"]
+        cut = row["cut"]
+        erd = row["erd"]
+        city = row["city"]
+
+
+
+Load the containers at New Philadelphia OH 44663
+
+If you have the capacity, please advise on the price."
+
+
+    
+
+
 
 
 # Web sraping for page

@@ -3,155 +3,157 @@ import time, csv, sys, os
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
-class WebExtract (): 
-    """ Extract order information, from the web store.tcgplayer.com"""
+class Web_scraping (): 
+    """ 
+    Get conact emails of trukers in page https://www.loadmatch.com/login.cfm
+    """
 
-    def __init__ (self, userPage, passPage): 
+    def __init__ (self, userPage, passPage, city_name): 
         print ('Opening Chrome...')
 
-        # user crdentials
+        # user crdentials of the page
         self.__userPage = userPage
         self.__passPage = passPage
 
-        # Web an order
-        self.__page = 'https://www.drayage.com/directory/city.cfm'
-        self.__orders = []
+        self.city_name = city_name
 
-        # CSv folder
-        self.__path = os.path.dirname (__file__)
-        self.__csvFolder = os.path.join (self.__path, 'csv')
+        # Pages of the website
+        self.__main_page = 'https://www.drayage.com/directory/city.cfm'
+        self.__login_page = "https://www.loadmatch.com/login.cfm"
 
+        # Web browser element (google chrome)
         self.__browser = webdriver.Chrome()
+
+        # List of url for each detal to contact a trucker
+        self.detail_pages_url = []
         
+    def __login (self):
+        """
+        Open web browser and login to the web page"
+        """
+
+        # Open login page in google chrome browser
+        self.__browser.get (self.__login_page)
+
+
+        # Input text of the user credential
+        userInput = self.__browser.find_element_by_css_selector ('[name="contact_username"]')
+
+        # Write the user in the input text
+        userInput.send_keys(self.__userPage)
+
+        # Input text of the password
+        passInput = self.__browser.find_element_by_css_selector ('[name="contact_password"]')
+
+        # Write the password
+        passInput.send_keys(self.__passPage)
+
+
+        # Login button
+        loginButton = self.__browser.find_element_by_css_selector ('[name="login_user"]')
         
-
-    def setOrders (self, orderList): 
-        self.__orders = orderList
-
-    def setCsvFile (self,  csvFile): 
-        self.__csvFile = csvFile
-
-    def login (self):
-        """ Open web browser and login to the web page"""
-
-        # Login
-        self.__browser.get (self.__page)
-        try: 
-            # Wait for load page
-            userInput = None
-            while not userInput: 
-                userInput = self.__browser.find_element_by_css_selector ('[name="contact_username"]')
-                userInput.send_keys(self.__userPage)
-                passInput = self.__browser.find_element_by_css_selector ('[name="contact_password"]')
-                passInput.send_keys(self.__passPage)
-                time.sleep(1)
-
-            # Check if login button is active
-            loginButton = self.__browser.find_element_by_css_selector ('[name="login_user"]')
-            if loginButton.is_enabled(): 
-                loginButton.click() 
-                print ('Auto login completed')
-            else: 
-                #Wait to continue or reload the page if the recaptcha fail
-                print ('\nPlease manually complete the reCaptchain in  chrome...\n')
-                askContinue = input ('Correct login? (y/n) ')
-                if askContinue.lower()[0] != 'y':
-                    self.__browser.close()
-                    self.login ()
-        except: 
-            askContinue = input ('Correct login? (y/n) ')
-            if askContinue.lower()[0] != 'y':
-                self.__browser.close()
-                self.login ()
-            
-        
-        
-
-    def __saveData (self, names, prices, cuantities, costs, order, outputWriter):
-        """ Read exctrated info, and write in a CSV file"""
-
-        for row in range (len(names)): 
-            currentRow = []
-
-            # Write order number
-            currentRow.append (order)
-            
-
-            # # Separate name in columns
-            # name_parts = (names[row].text).split(':')
-            # for name_part in name_parts: 
-            #     str(name_part).index ()
-            #     name_sections = name_part.split (' - ')
-            #     for names_section in name_sections: 
-            #         # Write name columns
-            #         currentRow.append(names_section)
-            
-            currentRow.append((names[row].text)[:(names[row].text).index('-')].strip())
-            currentRow.append((names[row].text)[(names[row].text).index('-')+1:(names[row].text).index(':')])
-            currentRow.append((names[row].text)[(names[row].text).index(':')+1:(names[row].text).rfind('-')])
-            currentRow.append((names[row].text)[(names[row].text).rfind('-')+1:])
-            
-
-            # Write last columns
-            currentRow.append(float((prices[row].text)[1:]))
-            currentRow.append(int(cuantities[row].text))
-            currentRow.append(float((costs[row].text)[1:])) 
-            
-            outputWriter.writerow(currentRow)
-            print ('Adding row to %s file' % (self.__csvFile))
+        # Send click to login button
+        loginButton.click() 
     
-    def extract (self):
-        """Extract infomation from page of each order"""
+    def __load_city (self): 
+        """
+        Load specific city of the main page
+        """
 
-        # Check if orderas already exist
-        if self.__orders:
+        # Load pages of cities
+        self.__browser.get (self.__main_page)
 
-            # Open file
-            csvFile = os.path.join (self.__csvFolder, self.__csvFile)
-            outputFile = open(csvFile, 'a', newline='')
-            outputWriter = csv.writer(outputFile)
 
-            # Writre header
-            outputWriter.writerow(["Order", "Game", "Set", "Card", "Condition", "Price", "Cuantity", "Cost"])
+        # Css selector of link elements in the web page
+        selector = "#bodyWrap > table:nth-child(3) a"
         
-            print ('Extracting info...')
+        # get all links of the cities in the page
+        cities = self.__browser.find_elements_by_css_selector (selector)
 
-            # loop for each order 
-            for order in self.__orders:
+        # variable to save the correct link of the city
+        city_page = ""
 
-                # Load order page
-                self.__browser.get (self.__page + '/' + order)
-
-                # Selector to find elements in the html page
-                names_selector      = 'table > tbody > tr.gradeA > td:nth-child(1) > a'
-                prices_selector     = 'table > tbody > tr.gradeA > td:nth-child(2) > div '
-                cuantities_selector = 'table > tbody > tr.gradeA > td:nth-child(3) > div'
-                costs_selector      = 'table > tbody > tr.gradeA > td:nth-child(4) > div'
-
-                # Exctract information from html elements
-                names = None
-                print ('Waiting for the page (order: %s)...' % order)
-                while not names: 
-                    names      = self.__browser.find_elements_by_css_selector (names_selector)
-                    prices     = self.__browser.find_elements_by_css_selector (prices_selector)
-                    cuantities = self.__browser.find_elements_by_css_selector (cuantities_selector)
-                    costs       = self.__browser.find_elements_by_css_selector (costs_selector)
-                    time.sleep (1)
-                
-                
-                # Save info in csv file
-                self.__saveData (names, prices, cuantities, costs, order, outputWriter)
-            outputFile.close()
-        else: 
-            print ('No new orders yet')
-        
-
-
-
-
+        # loop for each city in the web page
+        for city in cities: 
             
+            # Save the matching city
+            if str(city.text).lower().strip() == str(self.city_name).lower().strip(): 
+                city_page = city.get_attribute ("href")
+        
+        self.__browser.get (city_page)
+
+    def __get_details_pages (self): 
+        """
+        Get all contact page of each trucker in the current city
+        """
+
+        # Css selector of all links in the main table
+        selector = "body > table > tbody > tr > td > table:nth-child(1) a"
+
+        # Get all links in the main table 
+        links_elements = self.__browser.find_elements_by_css_selector (selector)
+
+        # Loop for each link
+        for link_element in links_elements: 
+
+            # Verify if link is a detail page
+            if str(link_element.text).lower().strip() == "detail": 
+
+                # Save the link in a variable
+                url = link_element.get_attribute ("href")
+
+                # Get the position of the parentesis
+                start_url_position = str(url).find ("(")
+                end_url_position = str(url).rfind (")")
+
+                # Remove aditional text of link
+                url = url[start_url_position + 2 :end_url_position - 1]
+
+                # Add link to list of pages
+                self.detail_pages_url.append (url)     
+
+    def get_email_truckers (self): 
+        """
+        Return a list of contact emails of a possible truckers
+        """        
+
+        # Makle a login for the web page
+        self.__login()
+
+        # Go to page of specific city
+        self.__load_city()
+
+        # Get all of details utl pages
+        self.__get_details_pages ()
+
+        # variable top save the contact emails
+        emails = []
+
+        # Loop for each page in details pages
+        for page in self.detail_pages_url:
+
+            self.__browser.get (page)
+
+            # CSS selecor for link emails
+            selector = "a"
+
+            # Get posible emails elements
+            links_elements = self.__browser.find_elements_by_css_selector (selector)
+
+            # Loop for each posible email
+            for link_element in links_elements: 
+
+                # Verify if link is an email
+                if "@" in link_element.text: 
+
+                    # Verity that the current email is not in the list of emails
+                    if link_element.text not in emails: 
+
+                        # Add email to email list
+                        emails.append (link_element.text)
+
+        return emails
 
 
 
-my_extractor = WebExtract ("kyitzchok", "freightNY")
-my_extractor.login()
+
