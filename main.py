@@ -7,6 +7,8 @@ from email_manager import Email_manager
 from data_manager import Data_manager
 from web_scraping import Web_scraping
 
+# TODO Test mode
+
 # Link of the google sheet
 sheet = "https://docs.google.com/spreadsheets/d/1ecgbu4-tBPrXJtZzMFKN1YQdBdJ9aE5tKWLGBdDhVE0/edit?usp=sharing"
 
@@ -68,7 +70,7 @@ for row in new_data:
         
         # get data for the email from google sheet
         amount = row["amount"]
-        type = row["type"]
+        type_container = row["type"]
         overweight = row["overweight"]
         commodity = row["commodity"]
         pick = row["pick"]
@@ -77,11 +79,28 @@ for row in new_data:
         erd = row["erd"]
         city = row["city"]
 
+        # Structure Email with user data input
 
+        # Add variables to subject
+        subject_mail = "[EXTERNAL] Freighters dray request {} to {}".format (pick, drop)
 
-Load the containers at New Philadelphia OH 44663
+        # Add variables to text 
+        text_mail = ""
+        text_mail += "Please let us know if you have capacity to carry this this week"
+        text_mail += "\n\nThe rail cut off is {}".format(cut)
+        text_mail += "\n\nWe have {} x {}'".format (amount, type_container)
+        text_mail += "\nLegal Weight" # PENDIENTE: Overweight shipment?
+        text_mail += "\n\n{}.".format (erd)
+        text_mail += "\n\nCommodity: {}".format (commodity)
+        text_mail += "\n\nPick up empty from {}".format (pick)
+        text_mail += "\n\nLoad the containers at {}".format (drop)
+        text_mail += "\n\nIf you have the capacity, please advise on the price"
 
-If you have the capacity, please advise on the price."
+        # Merge subject and text with the necesary structure to send the email
+        full_mail = "Subject: " + subject_mail + "\n\n" + text_mail 
+
+        # TODO Send email to each receiver
+
 
 
     
