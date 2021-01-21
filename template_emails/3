@@ -1,0 +1,17 @@
+[EXTERNAL] Freighters dray request <pick> to <drop>
+
+
+Please let us know if you have capacity to carry this this week
+The rail cut off is <cut>
+We have <amount> x <type_container>
+<weight>
+<overweight>
+The ERD for this load is: <erd>
+<aditional>
+Commodity: <commodity>
+Pick up empty from <pick>
+<loading>
+Drop the containers at <drop>
+If you have the capacity, please advise on the price
+
+THIS IS THE TEMPLATE 3

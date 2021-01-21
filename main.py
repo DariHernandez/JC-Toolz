@@ -6,6 +6,7 @@ from google_sheets import Google_sheets
 from email_manager import Email_manager
 from data_manager import Data_manager
 from web_scraping import Web_scraping
+from template_emails import Template_emails
 
 # TODO Test mode
 
@@ -51,6 +52,9 @@ for row in new_data:
     # Do a login to smtp service
     my_email_manager.login (email_user, password_user)
 
+    #  testing
+    message = Template_emails(row).get_email_text_random()
+    print (message)
 
     # WEB SCRAPING
 
@@ -67,7 +71,7 @@ for row in new_data:
 
     # If list of emails isnt empty, then get the text email
     if emails:
-        email_message = my_email_manager.get_email(row)
+        email_message = Template_emails(data).get_email_text(1)
         print (email_message)
         print ("\n\n--------------------------\n\n")
 
