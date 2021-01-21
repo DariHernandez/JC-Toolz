@@ -120,6 +120,7 @@ class Email_manager ():
         overweight = data["overweight"]
         commodity = data["commodity"]
         pick = data["pick"]
+        loading = data["loading"]
         drop = data["drop"]
         cut = data["cut"]
         erd = data["erd"]
@@ -152,7 +153,12 @@ class Email_manager ():
 
         text_mail += "\n\nCommodity: {}".format (commodity)
         text_mail += "\n\nPick up empty from {}".format (pick)
-        text_mail += "\n\nLoad the containers at {}".format (drop)
+
+        # Validate loading location
+        if str(loading).lower().strip() != "": 
+            text_mail += "\n\nThe loading location is: {}".format (loading)
+
+        text_mail += "\n\nDrop the containers at {}".format (drop)
         text_mail += "\n\nIf you have the capacity, please advise on the price"
 
         # Merge subject and text with the necesary structure to send the email
