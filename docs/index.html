@@ -40,33 +40,31 @@
 
             <!-- Input for number between 1 an 99 -->
             <label for="amount">Container amount:</label>
-            <input name="amount" type="number" class="input-text" id="amount" placeholder=" 1 - 99" required max="99" min="1" oninvalid="this.setCustomValidity('Only numbers between 1 an 99')">
+            <input name="amount" type="number" class="input-text" id="amount" placeholder=" 1 - 99" required max="99" min="1">
 
             <!-- Input with list of values -->
             <label for="type">Container type:</label>
-            <input name="type" list="containers" class="input-list" id="type" placeholder="Choose one" required oninvalid="this.setCustomValidity('Invalid option')">
-            <datalist id="containers">
-                <option value="40HC">
-                <option value="40STD">
-                <option value="40RF">
-                <option value="20STD">
-                <option value="20RF">
-            </datalist>
+            <select name="type" class="input-list" id="type" placeholder="Choose one" required>
+                <option value="40HC">40HC</option>
+                <option value="40STD">40STD</option>
+                <option value="40RF">40RF</option>
+                <option value="20STD">20STD</option>
+                <option value="20RF">20RF</option>
+            </select>
 
             <label for="weight">Approximate Weight (kgs):</label>
-            <input name="weight" type="number" class="input-text" id="weight" placeholder="1 kg minimum (optional)" min="1" oninvalid="this.setCustomValidity('Numbers greater than 1')">
+            <input name="weight" type="number" class="input-text" id="weight" placeholder="1 kg minimum (optional)" min="1">
 
             <!-- Input with list of values -->
             <label for="overweight">Overweight shipment?</label>
-            <input name="overweight" list="bolean" class="input-list" id="overweight" placeholder="yes / no" required oninvalid="this.setCustomValidity('Invalid option')">
-            <datalist id="bolean">
-                <option value="yes">
-                <option value="no">
-            </datalist>
+            <select name="overweight" class="input-list" id="overweight" placeholder="yes / no">
+                <option value="yes">yes</option> 
+                <option value="no">no</option>
+            </select>
 
             <!-- Input of free text -->
             <label for="commodity">Commodity:</label>
-            <textarea name="commodity" class="text-area" id="commodity" placeholder="Type here" required></textarea>
+            <input name="commodity" class="text-area" id="commodity" placeholder="Type here" required>
             
             <!-- Input of free text -->
             <label for="pick">Pick up location:</label>
@@ -89,94 +87,60 @@
             <input type="date" name="erd" class="text-area" id="erd" placeholder="Type a date" required>
 
             <!-- Input with list of values -->
-            <label for="city">City location of desired trucker:</label>
-            <input name="city" list="cities" class="input-list" id="city" placeholder="choose a city" required>
-            <datalist id="cities">
-                <option value="AK - Anchorage">
-                <option value="AL - Birmingham">
-                <option value="AL - Huntsville">
-                <option value="AL - Mobile">
-                <option value="AZ - Phoenix/Tucson">
-                <option value="CA - Los Angeles">
-                <option value="CA - San Bernardino">
-                <option value="CA - San Fran./Oakland">
-                <option value="CA - Stockton/Lathrop">
-                <option value="CO - Denver">
-                <option value="DE - Wilmington, DE">
-                <option value="FL - Jacksonville">
-                <option value="FL - Miami/Ft.Lauderdale">
-                <option value="FL - Panama City">
-                <option value="FL - Tampa">
-                <option value="FL - Titusville">
-                <option value="FL - Winter Haven">
-                <option value="GA - Atlanta">
-                <option value="GA - Chatsworth/ARP">
-                <option value="GA - Cordele">
-                <option value="GA - Savannah">
-                <option value="HI - Honolulu">
-                <option value="IL - Chicago">
-                <option value="IL - Decatur">
-                <option value="IN - Indianapolis">
-                <option value="KY - Georgetown">
-                <option value="KY - Louisville">
-                <option value="LA - New Orleans">
-                <option value="MA - Boston">
-                <option value="MA - Springfield">
-                <option value="MA - Worcester/Ayer">
-                <option value="MD - Baltimore">
-                <option value="ME - Portland (Maine)">
-                <option value="MI - Detroit">
-                <option value="MN - Duluth">
-                <option value="MN - Minne/St. Paul">
-                <option value="MO - Kansas City">
-                <option value="MO - St. Louis">
-                <option value="MS - Gulfport">
-                <option value="MS - Jackson">
-                <option value="NC - Charlotte">
-                <option value="NC - Greensboro">
-                <option value="NC - Wilmington">
-                <option value="ND - Minot">
-                <option value="NE - Omaha">
-                <option value="NM - Albuquerque">
-                <option value="NV - Las Vegas">
-                <option value="NV - Reno">
-                <option value="NY - Albany">
-                <option value="NY - Buffalo">
-                <option value="NY - New York City/NJ">
-                <option value="NY - Syracuse">
-                <option value="OH - Cincinnati">
-                <option value="OH - Cleveland">
-                <option value="OH - Columbus">
-                <option value="OH - Toledo/North Balt.">
-                <option value="OR - Portland">
-                <option value="PA - Allentown/Beth.">
-                <option value="PA - Chambrg/Greencastle">
-                <option value="PA - Harrisburg/Rutherford">
-                <option value="PA - Philadelphia">
-                <option value="PA - Pittsburgh">
-                <option value="PA - Scranton/Taylor">
-                <option value="SC - Charleston">
-                <option value="SC - Dillon">
-                <option value="SC - Greer">
-                <option value="TN - Memphis">
-                <option value="TN - Nashville">
-                <option value="TX - Dallas/Ft. Worth">
-                <option value="TX - El Paso">
-                <option value="TX - Freeport">
-                <option value="TX - Houston">
-                <option value="TX - Laredo">
-                <option value="TX - Rio Valley/McAllen">
-                <option value="TX - San Antonio">
-                <option value="UT - Salt Lake City">
-                <option value="VA - Front Royal">
-                <option value="VA - Norfolk">
-                <option value="VA - Richmond">
-                <option value="WA - Quincy">
-                <option value="WA - Seattle/Tacoma">
-                <option value="WA - Spokane">
-                <option value="WI - Chippewa Falls">
-                <option value="WV - Prichard">
-            </datalist>
+            <label for="state">State:</label>
+            <select name="state" class="input-list" id="state" selected="No state" required>
+                <option value="N/A">No state</option>
+                <option value="AL">Alabama</option>
+                <option value="AK">Alaska</option>
+                <option value="AZ">Arizona</option>
+                <option value="CA">California</option>
+                <option value="CO">Colorado</option>
+                <option value="DE">Delaware</option>
+                <option value="FL">Florida</option>
+                <option value="GA">Georgia</option>
+                <option value="HI">Hawaii</option>
+                <option value="IL">Illinois</option>
+                <option value="IN">Indiana</option>
+                <option value="KY">Kentucky</option>
+                <option value="LA">Louisiana</option>
+                <option value="ME">Maine</option>
+                <option value="MD">Maryland</option>
+                <option value="MA">Massachusetts</option>
+                <option value="MI">Michigan</option>
+                <option value="MN">Minnesota</option>
+                <option value="MS">Mississippi</option>
+                <option value="MO">Missouri</option>
+                <option value="NC">North Carolina</option>
+                <option value="ND">North Dakota</option>
+                <option value="NE">Nebraska</option>
+                <option value="NV">Nevada</option>
+                <option value="NM">New Mexico</option>
+                <option value="NY">New York</option>
+                <option value="OH">Ohio</option>
+                <option value="OR">Oregon</option>
+                <option value="PA">Pennsylvania</option>
+                <option value="SC">South Carolina</option>
+                <option value="TN">Tennessee</option>
+                <option value="TX">Texas</option>
+                <option value="UT">Utah</option>
+                <option value="VA">Virginia</option>
+                <option value="WA">Washington</option>
+                <option value="WI">Wisconsin</option>
+                <option value="WV">Wyoming</option>
+            </select>
+
+            <label for="city" class="hide" id="city_label">City:</label>
+            <select name="city" class="input-list hide" id="city" required>
+            </select>
+
+
+            <!-- Port or rile option only for specific cities -->
+            <label for="port_rail">Port or rail transport: </label>
+            <select name="port_rail" class="input-list" id="port_rail">
+                <option value="port">Port</option> 
+                <option value="rail">Rail</option>
+                <option value="both">Port and rail</option>
+            </select>
 
             <!-- Input of free text -->
             <label for="aditional">Additiona requirements:</label>
@@ -187,22 +151,11 @@
                 <input type="submit" class="button" id="submit_button" value="Submit data">
             </div>
             
-
         </form>
 
     </div>
 
-<!-- Code to send data to google SS -->
-<script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwJQk7QFq4gD2zc5JuLiEqJxHxlyJbHftXzVciUfGCqlDkBRhox8vGJDQ/exec'
-    const form = document.forms['submit-to-google-sheet']
-    
-    form.addEventListener('submit', e => {
-        e.preventDefault()
-        fetch(scriptURL, { method: 'POST', body: new FormData(form)})
-        .then(response => console.log('Success!', response))
-        .catch(error => console.error('Error!', error.message))
-    })
-    </script>
+
+    <script src="code.js"></script>
 </body>
 </html>

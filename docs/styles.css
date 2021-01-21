@@ -65,6 +65,12 @@ textarea {
     font-size: 22px;
 }
 
-textarea, input {
+textarea, input, select {
     height: 25px;
+    box-sizing: content-box;
 }
+
+.hide {
+    display: none;
+}
+
