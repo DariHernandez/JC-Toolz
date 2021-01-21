@@ -70,15 +70,15 @@
             
             <!-- Input of free text -->
             <label for="pick">Pick up location:</label>
-            <textarea name="pick" class="text-area" id="pick" placeholder="Type an address here" required></textarea>
+            <input type="text" name="pick" class="input-text" id="pick" placeholder="Type an address here" required placeholder="Type an address here" pattern="^(\s*\w+\s*)+,(\s*\w+\s*)+,(\s*\d\s*)+$" title="The address must be in the format: city, state, zip code">
             
             <!-- Input of free text -->
             <label for="loading">Loading location:</label>
-            <textarea name="loading" class="text-area" id="loading" placeholder="Type an address here (optional)"></textarea>
+            <input type="text" name="loading" class="text-area" id="loading" placeholder="Type an address here (optional)" placeholder="Type an address here" pattern="^(\s*\w+\s*)+,(\s*\w+\s*)+,(\s*\d\s*)+$" title="The address must be in the format: city, state, zip code">
 
             <!-- Input of free text -->
             <label for="drop">Drop off location:</label>
-            <textarea name="drop" class="text-area" id="drop" placeholder="Type an address here" required></textarea>
+            <input type="text" name="drop" class="text-area" id="drop" placeholder="Type an address here" required placeholder="Type an address here" pattern="^(\s*\w+\s*)+,(\s*\w+\s*)+,(\s*\d\s*)+$" title="The address must be in the format: city, state, zip code">
 
             <!-- Input of free text -->
             <label for="cut">Cut Off/Due date:</label>
