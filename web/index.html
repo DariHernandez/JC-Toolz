@@ -31,12 +31,12 @@
 
             <!-- Input of free text -->
             <label for="email">Email:</label>
-            <input name="email" type="email" class="input-text" id="email" placeholder="MyEmail@gmail.com">
+            <input name="email" type="email" class="input-text" id="email" placeholder="MyEmail@gmail.com" required>
             
 
             <!-- Input of free text -->
             <label for="pass">Pasword:</label>
-            <input name="pass" type="password" class="input-text" id="pass" placeholder="Your email password">
+            <input name="pass" type="password" class="input-text" id="pass" placeholder="Your email password" required>
 
             <!-- Input for number between 1 an 99 -->
             <label for="amount">Container amount:</label>
@@ -52,6 +52,9 @@
                 <option value="20STD">
                 <option value="20RF">
             </datalist>
+
+            <label for="weight">Approximate Weight (kgs):</label>
+            <input name="weight" type="number" class="input-text" id="weight" placeholder="1 kg minimum (optional)" min="1" oninvalid="this.setCustomValidity('Numbers greater than 1')">
 
             <!-- Input with list of values -->
             <label for="overweight">Overweight shipment?</label>
@@ -75,11 +78,11 @@
 
             <!-- Input of free text -->
             <label for="cut">Cut Off/Due date:</label>
-            <textarea name="cut" class="text-area" id="cut" placeholder="Type here" required></textarea>
+            <input type="date" name="cut" class="text-area" id="cut" required>
 
             <!-- Input of free text -->
             <label for="erd">ERD:</label>
-            <textarea name="erd" class="text-area" id="erd" placeholder="Type here" required></textarea>
+            <input type="date" name="erd" class="text-area" id="erd" placeholder="Type a date" required>
 
             <!-- Input with list of values -->
             <label for="city">City location of desired trucker:</label>
@@ -171,7 +174,11 @@
                 <option value="WV - Prichard">
             </datalist>
 
-             <!-- Submit button-->
+            <!-- Input of free text -->
+            <label for="aditional">Additiona requirements:</label>
+            <textarea name="aditional" class="text-area" id="erd" placeholder="Optional field"></textarea>
+
+            <!-- Submit button-->
             <div class="submit_container">
                 <input type="submit" class="button" id="submit_button" value="Submit data">
             </div>

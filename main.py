@@ -46,10 +46,10 @@ for row in new_data:
     password_user = row["pass"]
 
     # Make an instance of the email manager
-    my_email = Email_manager (email_server, password_server)
+    my_email_manager = Email_manager (email_server, password_server)
 
     # Do a login to smtp service
-    my_email.login (email_user, password_user)
+    my_email_manager.login (email_user, password_user)
 
 
     # WEB SCRAPING
@@ -59,45 +59,24 @@ for row in new_data:
     
     # Credentials of the web page
     page_user = "kyitzchok"
-    page_password = "freightNY"
+    page_password = "freightNY" 
 
     # Instance of the web scraping class
     my_web_scraping = Web_scraping (page_user, page_password, city_name)
     emails = my_web_scraping.get_email_truckers ()
 
-    # Make a loop for each contact email
-    for email in emails: 
+    # If list of emails isnt empty, then get the text email
+    if emails:
+        email_message = my_email_manager.get_email(row)
+        print (email_message)
+        print ("\n\n--------------------------\n\n")
+
+
+
+    # # Make a loop for each contact email
+    # for email in emails: 
         
-        # get data for the email from google sheet
-        amount = row["amount"]
-        type_container = row["type"]
-        overweight = row["overweight"]
-        commodity = row["commodity"]
-        pick = row["pick"]
-        drop = row["drop"]
-        cut = row["cut"]
-        erd = row["erd"]
-        city = row["city"]
-
-        # Structure Email with user data input
-
-        # Add variables to subject
-        subject_mail = "[EXTERNAL] Freighters dray request {} to {}".format (pick, drop)
-
-        # Add variables to text 
-        text_mail = ""
-        text_mail += "Please let us know if you have capacity to carry this this week"
-        text_mail += "\n\nThe rail cut off is {}".format(cut)
-        text_mail += "\n\nWe have {} x {}'".format (amount, type_container)
-        text_mail += "\nLegal Weight" # PENDIENTE: Overweight shipment?
-        text_mail += "\n\n{}.".format (erd)
-        text_mail += "\n\nCommodity: {}".format (commodity)
-        text_mail += "\n\nPick up empty from {}".format (pick)
-        text_mail += "\n\nLoad the containers at {}".format (drop)
-        text_mail += "\n\nIf you have the capacity, please advise on the price"
-
-        # Merge subject and text with the necesary structure to send the email
-        full_mail = "Subject: " + subject_mail + "\n\n" + text_mail 
+        
 
         # TODO Send email to each receiver
 

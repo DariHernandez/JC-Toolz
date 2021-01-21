@@ -9,7 +9,6 @@ class Web_scraping ():
     """
 
     def __init__ (self, userPage, passPage, city_name): 
-        print ('Opening Chrome...')
 
         # user crdentials of the page
         self.__userPage = userPage
@@ -89,6 +88,7 @@ class Web_scraping ():
 
         # Css selector of all links in the main table
         selector = "body > table > tbody > tr > td > table:nth-child(1) a"
+        selector_company = "body > table > tbody > tr > td > table:nth-child(1) > tbody > tr:nth-child > td:nth-child(14)"
 
         # Get all links in the main table 
         links_elements = self.__browser.find_elements_by_css_selector (selector)
@@ -152,6 +152,7 @@ class Web_scraping ():
                         # Add email to email list
                         emails.append (link_element.text)
 
+        self.__browser.close()
         return emails
 
 

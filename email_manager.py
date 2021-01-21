@@ -108,4 +108,54 @@ class Email_manager ():
         # Send message
         self.smtpObj_client.sendmail (self.email_user, to_email, message)
 
+    def get_email (self, data): 
+        """
+        Create and return the email message for the truckers
+        """
 
+        # get data for the email from google sheet
+        amount = data["amount"]
+        type_container = data["type"]
+        weight = data ["weight"]
+        overweight = data["overweight"]
+        commodity = data["commodity"]
+        pick = data["pick"]
+        drop = data["drop"]
+        cut = data["cut"]
+        erd = data["erd"]
+        aditional = data ["aditional"]
+
+        # Structure Email with user data input
+
+        # Add variables to subject
+        subject_mail = "[EXTERNAL] Freighters dray request {} to {}".format (pick, drop)
+
+        # Add variables to text 
+        text_mail = ""
+        text_mail += "Please let us know if you have capacity to carry this this week"
+        text_mail += "\n\nThe rail cut off is {}".format(cut)
+        text_mail += "\n\nWe have {} x {}'".format (amount, type_container)
+
+        # verify value of overweight
+        if str(overweight).lower().strip() == "yes": 
+            text_mail += "\n\nOverweight shipment"
+
+        # verify if exist weight value
+        if str(weight).lower().strip() != "": 
+            text_mail += "\n\nApproximate Weight: {} kgs".format (weight)
+
+        text_mail += "\n\nThe ERD for this load is: {}.".format (erd)
+
+        # Verify if exist aditional details
+        if str(aditional).lower().strip() != "": 
+            text_mail += "\n\n{}".format (aditional)
+
+        text_mail += "\n\nCommodity: {}".format (commodity)
+        text_mail += "\n\nPick up empty from {}".format (pick)
+        text_mail += "\n\nLoad the containers at {}".format (drop)
+        text_mail += "\n\nIf you have the capacity, please advise on the price"
+
+        # Merge subject and text with the necesary structure to send the email
+        full_mail = "Subject: " + subject_mail + "\n\n" + text_mail 
+
+        return full_mail
