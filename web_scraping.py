@@ -1,7 +1,7 @@
 #! python3
 
 import pprint
-import requests, time
+import requests, random, bs4
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
@@ -32,6 +32,32 @@ class Web_scraping ():
 
         # List of url for each detal to contact a trucker
         self.detail_pages_url = []
+
+        # List of proxy servers, to scrape all the information.
+        self.proxy_list = [
+            "104.248.123.76:18080",
+            "206.176.80.60:3128",
+            "192.241.218.202:5555",
+            "38.91.100.171:3128",
+            "64.235.204.107:3128",
+            "185.198.188.54:8080",
+            "185.198.188.49:8080",
+            "206.176.80.60:3128",
+            "176.9.85.13:3128",
+            "217.6.21.170:8080",
+            "217.6.21.174:8080",
+            "51.158.123.35:9999",
+            "51.158.68.68:8811",
+            "38.91.100.171:3128",
+            "51.158.68.133:8811",
+            "198.50.163.192:3129",
+            "51.158.99.51:8811",
+            "62.171.144.29:3128"
+        ]
+
+        # Variable for save all company contact information
+        self.contact_data = []
+        
         
     def login (self):
         """
@@ -130,7 +156,8 @@ class Web_scraping ():
             # Reload the same page
             self.__get_details_pages (self.state_city_name_link)
 
-
+        # Close web browser
+        self.browser.close()
 
     def __get_details_pages (self, page): 
         """
@@ -225,19 +252,6 @@ class Web_scraping ():
         """
         Return a list of contact emails of a possible truckers
         """        
-
-        # Login to the page
-        self.login()
-
-        # Load the correct city from the user input
-        self.load_city()
-
-        # Filter result between port and rail transport
-        self.load_port_rail_pages()
-
-        # Variable for save all company emails
-        contact_data = []
-
         
         # Loop for each page in details pages
         for company_name,page  in self.detail_pages_url:
@@ -249,25 +263,48 @@ class Web_scraping ():
             web_pages = [page]
         
 
-            # Open details page
-            self.browser.get (page)
-            print (company_name)
+            
+            # Try to load pages with random proxy
+            # If select proxy fail, try with other
+            try: 
+                # Select random proxy of the list
+                random_proxy = random.choice (self.proxy_list)
 
-            # Update the vpn in each query, so as not to saturate the web page servers
+                print (company_name, random_proxy)
+
+                proxies = {
+                    "http": "http://" + random_proxy, 
+                    "https": "http://" + random_proxy,
+                }
+
+                # Get the page with random proxy
+                res = requests.get (page, proxies=proxies)
+
+                # Read the web page with beautiful soup
+                soup = bs4.BeautifulSoup (res.text, "html.parser")
+            
+            # Catch error and try again with recursivity
+            except: 
+                return self.get_contact_data()
+
 
             # GET EMAILS
+            print (res.text)
+
 
             # CSS selecor for link emails
-            selector = "a"
+            selector = "body > table:nth-child(2) a > u"
 
             # Get posible emails elements
-            links_elements = self.browser.find_elements_by_css_selector (selector)
+            links_elements = soup.select (selector)
 
             # Loop for each posible email
             for link_element in links_elements: 
 
                 # Verify if link is an email
-                if "@" in link_element.text: 
+                print (link_element.getText())
+
+                if "@" in link_element.getText(): 
 
                     # Verity that the current email is not in the list of emails
                     if link_element.text not in emails: 
@@ -276,43 +313,52 @@ class Web_scraping ():
                         emails.append (link_element.text)
             
 
-            # read all register for the contact data
-            for contact_row in contact_data: 
+            # Control variable to detect if current register already exist in the list
+            current_register_in_list = False
 
-                # Get the company name, emails and web page fo the current register
-                row_name = contact_row["company_name"]
-                row_emails = contact_row["emails"]
-                row_web_page = contact_row["web_pages"]
+            # If contact data list isn't empty, validate each value
+            if self.contact_data: 
 
-                # Verify if the company already exist in the contact data
-                if row_name == str(company_name).strip(): 
+                # read all register for the contact data
+                for contact_row in self.contact_data: 
 
-                    # Loop for each email in new email list
-                    for email in emails: 
+                    # Get the company name, emails and web page fo the current register
+                    row_name = contact_row["company_name"]
+                    row_emails = contact_row["emails"]
+                    row_web_page = contact_row["web_pages"]
+
+                    # Verify if the company already exist in the contact data
+                    if row_name == str(company_name).strip(): 
                         
-                        # If email no current email do no exist in the last email list, add it
-                        if not email in row_emails: 
-                            row_emails.append (email)
+                        # Update control variable
+                        current_register_in_list = True
+
+                        # Loop for each email in new email list
+                        for email in emails: 
+                            
+                            # If email no current email do no exist in the last email list, add it
+                            if not email in row_emails: 
+                                row_emails.append (email)
+                        
+                        # Add the new erb page to the last web page list
+                        row_web_page.append (self.__short_url(page))
+
+                        # Add the update data to contact list
+                        contact_row["emails"] = row_emails
+                        contact_row["web_pages"] = row_web_page
                     
-                    # Add the new erb page to the last web page list
-                    row_web_page.append (self.__short_url(page))
+            
+            # Verify if the current register is a new register
+            if not current_register_in_list: 
 
-                    # Add the update data to contact list
-                    contact_row["emails"] = row_emails
-                    contact_row["web_pages"] = row_web_page
-                
-                # If company doesn't exist in the contact list, add it
-                else: 
+                # Save new register in contact list, ad a dictionary
+                self.contact_data.append ({
+                    "company_name": str(company_name).strip(), 
+                    "emails": emails, 
+                    "web_pages": [self.__short_url(page)]
+                    })
 
-                    # Save new register in contact list, ad a dictionary
-                    contact_data.append ({
-                        "company_name": str(company_name).strip(), 
-                        "emails": emails, 
-                        "web_pages": self.__short_url(page)
-                        })
-
-        self.browser.close()
-        return contact_data
+        return self.contact_data
 
     def __short_url (self, url): 
         """
@@ -332,11 +378,15 @@ class Web_scraping ():
 
 
 # my_web_scraping = Web_scraping ("kyitzchok", "freightNY", "AK", "Anchorage", "both")
-# my_web_scraping = Web_scraping ("kyitzchok", "freightNY", "AL", "Mobile", "both")
-my_web_scraping = Web_scraping ("kyitzchok", "freightNY", "CA", "Los Angeles", "both")
+my_web_scraping = Web_scraping ("kyitzchok", "freightNY", "AL", "Mobile", "both")
+# my_web_scraping = Web_scraping ("kyitzchok", "freightNY", "CA", "Los Angeles", "both")
 # my_web_scraping = Web_scraping ("kyitzchok", "freightNY", "PA", "Scranton/Taylor", "both")
 # my_web_scraping = Web_scraping ("kyitzchok", "freightNY", "SC", "Greer", "both")
 # my_web_scraping = Web_scraping ("kyitzchok", "freightNY", "TN", "Memphis", "both")
 
+
+my_web_scraping.login()
+my_web_scraping.load_city()
+my_web_scraping.load_port_rail_pages()
 contact_data = my_web_scraping.get_contact_data()
 pprint.pprint (contact_data)
