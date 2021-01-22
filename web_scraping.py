@@ -1,7 +1,7 @@
 #! python3
 
 import pprint
-import requests, random, bs4
+import requests, random, bs4, time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
@@ -220,6 +220,7 @@ class Web_scraping ():
 
             # Generate a CSS selector for get all links for each row
             selector_link = "body > table > tbody > tr > td > table:nth-child(1) > tbody > tr:nth-child({}) > td:nth-child(13) > a".format (row_index+3)
+            
 
             # Try to get element of details
             try: 
@@ -247,64 +248,84 @@ class Web_scraping ():
                 # If element doesnt exist / error happend, continue to the next element
                 continue
 
+    def open_proxy_chrome (self):
+        """
+        Create a google chrome instance with random proxy
+        """
+
+        # Try to load pages with random proxy
+        # If select proxy fail, try with other
+        try: 
+
+            # Select random proxy of the list
+            random_proxy = random.choice (self.proxy_list)
+
+            # Configure chrome with the random proxy
+            chrome_options = webdriver.ChromeOptions()
+            chrome_options.add_argument('--proxy-server={}'.format(random_proxy))
+
+            #  Make a new web browser with proxy configurations
+            self.browser = webdriver.Chrome(options=chrome_options)     
+
+            # Make login to preview information
+            self.login()
+        
+        # Catch error and try again with recursivity
+        except: 
+            self.browser.close()
+            return self.get_contact_data()
+
 
     def get_contact_data (self): 
         """
         Return a list of contact emails of a possible truckers
         """        
-        
+
+        # Open a chrome windows with random proxy
+        self.open_proxy_chrome ()
+
+        # Counter of each pages opened
+        counter_pages = 0
+
         # Loop for each page in details pages
         for company_name,page  in self.detail_pages_url:
+
+            # Update the number of web pages opened
+            counter_pages += 1
+
+            # Reopen chrome window each 15 pages
+            if counter_pages == 15: 
+                self.open_proxy_chrome ()
 
             # variable top save the contact emails in each page
             emails = []
 
             # List data pages for the company
             web_pages = [page]
-        
 
-            
-            # Try to load pages with random proxy
-            # If select proxy fail, try with other
+            # Try to open page. If error happend, reload chrome with other proxy
             try: 
-                # Select random proxy of the list
-                random_proxy = random.choice (self.proxy_list)
-
-                print (company_name, random_proxy)
-
-                proxies = {
-                    "http": "http://" + random_proxy, 
-                    "https": "http://" + random_proxy,
-                }
-
-                # Get the page with random proxy
-                res = requests.get (page, proxies=proxies)
-
-                # Read the web page with beautiful soup
-                soup = bs4.BeautifulSoup (res.text, "html.parser")
-            
-            # Catch error and try again with recursivity
+                # Open the details page
+                self.browser.get (page)     
             except: 
-                return self.get_contact_data()
+                # Reload chrome
+                self.open_proxy_chrome()
 
 
             # GET EMAILS
-            print (res.text)
-
 
             # CSS selecor for link emails
-            selector = "body > table:nth-child(2) a > u"
+            # selector = "body > table:nth-child(2) > tbody > tr:nth-child(7) > td:nth-child(2) > a > u"
+            selector = "a > u"
 
             # Get posible emails elements
-            links_elements = soup.select (selector)
+            links_elements = self.browser.find_elements_by_css_selector (selector)
 
             # Loop for each posible email
             for link_element in links_elements: 
 
                 # Verify if link is an email
-                print (link_element.getText())
-
-                if "@" in link_element.getText(): 
+                if "@" in link_element.text: 
 
                     # Verity that the current email is not in the list of emails
                     if link_element.text not in emails: 
@@ -325,7 +346,6 @@ class Web_scraping ():
                     # Get the company name, emails and web page fo the current register
                     row_name = contact_row["company_name"]
                     row_emails = contact_row["emails"]
-                    row_web_page = contact_row["web_pages"]
 
                     # Verify if the company already exist in the contact data
                     if row_name == str(company_name).strip(): 
@@ -339,13 +359,9 @@ class Web_scraping ():
                             # If email no current email do no exist in the last email list, add it
                             if not email in row_emails: 
                                 row_emails.append (email)
-                        
-                        # Add the new erb page to the last web page list
-                        row_web_page.append (self.__short_url(page))
 
                         # Add the update data to contact list
                         contact_row["emails"] = row_emails
-                        contact_row["web_pages"] = row_web_page
                     
             
             # Verify if the current register is a new register
@@ -355,8 +371,11 @@ class Web_scraping ():
                 self.contact_data.append ({
                     "company_name": str(company_name).strip(), 
                     "emails": emails, 
-                    "web_pages": [self.__short_url(page)]
+                    "web_page": self.__short_url(page)
                     })
+
+        # Close current browser
+        self.browser.close()
 
         return self.contact_data
 
@@ -378,8 +397,8 @@ class Web_scraping ():
 
 
 # my_web_scraping = Web_scraping ("kyitzchok", "freightNY", "AK", "Anchorage", "both")
-my_web_scraping = Web_scraping ("kyitzchok", "freightNY", "AL", "Mobile", "both")
-# my_web_scraping = Web_scraping ("kyitzchok", "freightNY", "CA", "Los Angeles", "both")
+# my_web_scraping = Web_scraping ("kyitzchok", "freightNY", "AL", "Mobile", "both")
+my_web_scraping = Web_scraping ("kyitzchok", "freightNY", "CA", "Los Angeles", "both")
 # my_web_scraping = Web_scraping ("kyitzchok", "freightNY", "PA", "Scranton/Taylor", "both")
 # my_web_scraping = Web_scraping ("kyitzchok", "freightNY", "SC", "Greer", "both")
 # my_web_scraping = Web_scraping ("kyitzchok", "freightNY", "TN", "Memphis", "both")
