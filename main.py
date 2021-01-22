@@ -58,15 +58,19 @@ for row in new_data:
 
     # WEB SCRAPING
 
-    # name of the city to make web sraping
+    # Location of the trucker
+    state_name = row["state"]
     city_name = row["city"]
     
     # Credentials of the web page
     page_user = "kyitzchok"
     page_password = "freightNY" 
 
+    # Varible of input user: port, rile or both
+    port_rail = row["port_rail"]
+
     # Instance of the web scraping class
-    my_web_scraping = Web_scraping (page_user, page_password, city_name)
+    my_web_scraping = Web_scraping (page_user, page_password, state_name, city_name, port_rail)
     emails = my_web_scraping.get_email_truckers ()
 
     # If list of emails isnt empty, then get the text email
