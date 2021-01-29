@@ -38,22 +38,20 @@ class Web_scraping ():
             "104.248.123.76:18080",
             "206.176.80.60:3128",
             "192.241.218.202:5555",
-            "38.91.100.171:3128",
             "64.235.204.107:3128",
             "185.198.188.54:8080",
             "185.198.188.49:8080",
-            "206.176.80.60:3128",
             "176.9.85.13:3128",
             "217.6.21.170:8080",
             "217.6.21.174:8080",
             "51.158.123.35:9999",
             "51.158.68.68:8811",
-            "38.91.100.171:3128",
             "51.158.68.133:8811",
             "198.50.163.192:3129",
             "51.158.99.51:8811",
-            "62.171.144.29:3128"
         ]
+
+        self.proxy_list_last = []
 
         # Variable for save all company contact information
         self.contact_data = []
@@ -147,7 +145,16 @@ class Web_scraping ():
             url_port_page = link_port.get_attribute("href")
             url_rail_page = link_rail.get_attribute("href")
 
+
+
+            # Hotfix urls
+            url_port_page_end = url_port_page.rfind("port=y")
+            url_rail_page_end = url_rail_page.rfind("rail=y")
+            url_port_page = url_port_page[:url_port_page_end+6]
+            url_rail_page = url_rail_page[:url_rail_page_end+6]
+
             # get the contact page for each trucker in port and rail transport
+            print ("Reading city pages...")
             self.__get_details_pages (url_port_page)
             self.__get_details_pages (url_rail_page)
 
@@ -218,9 +225,20 @@ class Web_scraping ():
             # get the name of the current company
             company_name = name_elements[row_index].text
 
+            # Variable to save the initial row of the table
+            initial_row = 3
+
+            # Get the initial row
+            selector_first_row = "body > table > tbody > tr > td > table:nth-child(1) > tbody > tr:nth-child(3) > td:nth-child(1)"
+            elem_first_row = self.browser.find_element_by_css_selector (selector_first_row)
+            colspan_first_row = elem_first_row.get_attribute ("colspan")
+
+            # Update initial row
+            if str(colspan_first_row) == "13": 
+                initial_row = 4
+
             # Generate a CSS selector for get all links for each row
-            selector_link = "body > table > tbody > tr > td > table:nth-child(1) > tbody > tr:nth-child({}) > td:nth-child(13) > a".format (row_index+3)
-            
+            selector_link = "body > table > tbody > tr > td > table:nth-child(1) > tbody > tr:nth-child({}) > td:nth-child(13) > a".format (row_index+initial_row)
 
             # Try to get element of details
             try: 
@@ -257,12 +275,30 @@ class Web_scraping ():
         # If select proxy fail, try with other
         try: 
 
-            # Select random proxy of the list
-            random_proxy = random.choice (self.proxy_list)
+            # Loop for select new proxy without repetitions 
+            while True: 
+
+                # Selecn random proxy
+                self.random_proxy = random.choice (self.proxy_list)
+
+                # Verify if proxy exist in the list of last proxies
+                if self.random_proxy in self.proxy_list_last:
+
+                    # If all proxies has been used, allow repetitions 
+                    if len(self.proxy_list_last) != len (self.proxy_list): 
+                        break
+                
+                # if proxy is not in last list, accept it and add to list
+                else: 
+                    self.proxy_list_last.append (self.random_proxy)
+                    break
+
+
+            print (self.random_proxy)
 
             # Configure chrome with the random proxy
             chrome_options = webdriver.ChromeOptions()
-            chrome_options.add_argument('--proxy-server={}'.format(random_proxy))
+            chrome_options.add_argument('--proxy-server={}'.format(self.random_proxy))
 
             #  Make a new web browser with proxy configurations
             self.browser = webdriver.Chrome(options=chrome_options)     
@@ -294,7 +330,8 @@ class Web_scraping ():
             counter_pages += 1
 
             # Reopen chrome window each 15 pages
-            if counter_pages == 15: 
+            if counter_pages == 10: 
+                self.browser.close()
                 self.open_proxy_chrome ()
 
             # variable top save the contact emails in each page
