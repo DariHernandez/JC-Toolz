@@ -154,7 +154,7 @@ class Web_scraping ():
             url_rail_page = url_rail_page[:url_rail_page_end+6]
 
             # get the contact page for each trucker in port and rail transport
-            print ("Reading city pages...")
+            print ("Scraping detail pages of the city...")
             self.__get_details_pages (url_port_page)
             self.__get_details_pages (url_rail_page)
 
@@ -271,6 +271,12 @@ class Web_scraping ():
         Create a google chrome instance with random proxy
         """
 
+        # If instance of web browser if open, close it
+        try: 
+            self.browser.close()
+        except: 
+            pass
+
         # Try to load pages with random proxy
         # If select proxy fail, try with other
         try: 
@@ -293,9 +299,6 @@ class Web_scraping ():
                     self.proxy_list_last.append (self.random_proxy)
                     break
 
-
-            print (self.random_proxy)
-
             # Configure chrome with the random proxy
             chrome_options = webdriver.ChromeOptions()
             chrome_options.add_argument('--proxy-server={}'.format(self.random_proxy))
@@ -317,22 +320,8 @@ class Web_scraping ():
         Return a list of contact emails of a possible truckers
         """        
 
-        # Open a chrome windows with random proxy
-        self.open_proxy_chrome ()
-
-        # Counter of each pages opened
-        counter_pages = 0
-
         # Loop for each page in details pages
         for company_name,page  in self.detail_pages_url:
-
-            # Update the number of web pages opened
-            counter_pages += 1
-
-            # Reopen chrome window each 15 pages
-            if counter_pages == 10: 
-                self.browser.close()
-                self.open_proxy_chrome ()
 
             # variable top save the contact emails in each page
             emails = []
@@ -340,13 +329,21 @@ class Web_scraping ():
             # List data pages for the company
             web_pages = [page]
 
-            # Try to open page. If error happend, reload chrome with other proxy
-            try: 
-                # Open the details page
-                self.browser.get (page)     
-            except: 
-                # Reload chrome
-                self.open_proxy_chrome()
+            # Loop to open the current page
+            while True: 
+
+                # Try to open page. If error happend, reload chrome with other proxy
+                try: 
+                    # Open the details page
+                    self.browser.get (page)     
+
+                    # Verify if page have not an error to load: Get header of the table
+                    elem_table_header = self.browser.find_element_by_css_selector ("body > table:nth-child(2) > tbody > tr:nth-child(1) > td")
+                except: 
+                    # Reload chrome
+                    self.open_proxy_chrome()
+                else: 
+                    break
 
 
             # GET EMAILS
